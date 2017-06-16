@@ -21,14 +21,47 @@ class GameViewController: UIViewController {
     
     var goingLeft = Bool()
     
+    var tempBox = SCNNode()
+    
+    var boxNumber = Int()
+    
     override func viewDidLoad() {
         self.createScene()
         
         
     }
     
+    func createBox() {
+        tempBox = SCNNode(geometry: firstBox.geometry)
+        let prevBox = scene.rootNode.childNode(withName: "\(boxNumber)", recursively: true)
+        
+        boxNumber += 1
+        tempBox.name = "\(boxNumber)"
+        
+        let randomNumber = arc4random() % 2
+        
+        switch randomNumber {
+        case 0:
+            tempBox.position = SCNVector3Make((prevBox?.position.x)! - firstBox.scale.x, (prevBox?.position.y)!, (prevBox?.position.z)!)
+            break
+        case 1:
+            tempBox.position = SCNVector3Make((prevBox?.position.x)!, (prevBox?.position.y)!, (prevBox?.position.z)! - firstBox.scale.z)
+            break
+        default:
+            break
+        }
+        
+        self.scene.rootNode.addChildNode(tempBox)
+        
+        
+    }
+    
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        createBox()
+        
         if goingLeft == false {
             person.removeAllActions()
             person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(-100, 0, 0), duration: 20)))
@@ -45,6 +78,8 @@ class GameViewController: UIViewController {
     
     
     func createScene() {
+        
+        boxNumber = 0
         
         self.view.backgroundColor = UIColor.white
         
@@ -83,6 +118,7 @@ class GameViewController: UIViewController {
         firstBoxGeo.materials = [boxMaterial]
         firstBox.position = SCNVector3Make(0, 0, 0)
         scene.rootNode.addChildNode(firstBox)
+        firstBox.name = "\(boxNumber)"
         
         // Create Light
         let light = SCNNode()
