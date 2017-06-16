@@ -15,6 +15,8 @@ class GameViewController: UIViewController {
     let scene = SCNScene()
     let cameraNode = SCNNode()
     
+    var person = SCNNode()
+    
     let firstBox = SCNNode()
     
     override func viewDidLoad() {
@@ -25,9 +27,21 @@ class GameViewController: UIViewController {
     
     func createScene() {
         
+        self.view.backgroundColor = UIColor.white
+        
         let sceneView = self.view as! SCNView
         
         sceneView.scene = scene
+        
+        // Create Person
+        let personGeo = SCNSphere(radius: 0.2)
+        person = SCNNode(geometry: personGeo)
+        let personMat = SCNMaterial()
+        personMat.diffuse.contents = UIColor.red
+        personGeo.materials = [personMat]
+        person.position = SCNVector3Make(0, 1.1, 0)
+        scene.rootNode.addChildNode(person)
+        
         
         // Create Camera
         cameraNode.camera = SCNCamera()
@@ -44,6 +58,9 @@ class GameViewController: UIViewController {
         // Cretae Box
         let firstBoxGeo = SCNBox(width: 1, height: 1.5, length: 1, chamferRadius: 0)
         firstBox.geometry = firstBoxGeo
+        let boxMaterial = SCNMaterial()
+        boxMaterial.diffuse.contents = UIColor(red: 0.2, green: 0.8, blue: 0.9, alpha: 1.0)
+        firstBoxGeo.materials = [boxMaterial]
         firstBox.position = SCNVector3Make(0, 0, 0)
         scene.rootNode.addChildNode(firstBox)
         
@@ -54,6 +71,11 @@ class GameViewController: UIViewController {
         light.eulerAngles = SCNVector3Make(-45, 45, 0)
         scene.rootNode.addChildNode(light)
         
+        let light2 = SCNNode()
+        light2.light = SCNLight()
+        light2.light?.type = SCNLight.LightType.directional
+        light2.eulerAngles = SCNVector3Make(45, 45, 0)
+        scene.rootNode.addChildNode(light2)
         
         
     }
