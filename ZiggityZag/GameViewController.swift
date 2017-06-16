@@ -19,11 +19,30 @@ class GameViewController: UIViewController {
     
     let firstBox = SCNNode()
     
+    var goingLeft = Bool()
+    
     override func viewDidLoad() {
         self.createScene()
         
         
     }
+    
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if goingLeft == false {
+            person.removeAllActions()
+            person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(-100, 0, 0), duration: 20)))
+            goingLeft = true
+        } else {
+            person.removeAllActions()
+            person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(0, 0, -100), duration: 20)))
+            goingLeft = false
+            
+        }
+        
+        
+    }
+    
     
     func createScene() {
         
@@ -49,10 +68,11 @@ class GameViewController: UIViewController {
         cameraNode.camera?.orthographicScale = 3
         cameraNode.position = SCNVector3Make(20, 20, 20)
         cameraNode.eulerAngles = SCNVector3Make(-45, 45, 0)
-        let constraint = SCNLookAtConstraint(target: firstBox)
+        let constraint = SCNLookAtConstraint(target: person)
         constraint.isGimbalLockEnabled = true
         self.cameraNode.constraints = [constraint]
         scene.rootNode.addChildNode(cameraNode)
+        person.addChildNode(cameraNode)
 
         
         // Cretae Box
