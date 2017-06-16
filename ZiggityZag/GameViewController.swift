@@ -10,7 +10,7 @@ import UIKit
 import QuartzCore
 import SceneKit
 
-class GameViewController: UIViewController {
+class GameViewController: UIViewController, SCNSceneRendererDelegate {
 
     let scene = SCNScene()
     let cameraNode = SCNNode()
@@ -23,13 +23,31 @@ class GameViewController: UIViewController {
     
     var tempBox = SCNNode()
     
+    var prevBoxNumber = Int()
+    
     var boxNumber = Int()
     
     override func viewDidLoad() {
         self.createScene()
+    }
+    
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        
+        let deleteBox = self.scene.rootNode.childNode(withName: "\(prevBoxNumber)", recursively: true)
+        
+        if (deleteBox?.position.x)! > person.position.x + 1 || (deleteBox?.position.z)! > person.position.z + 1 {
+            
+            prevBoxNumber += 1
+            deleteBox?.removeFromParentNode()
+        
+            createBox()
+            
+        }
         
         
     }
+    
     
     func createBox() {
         tempBox = SCNNode(geometry: firstBox.geometry)
@@ -60,8 +78,6 @@ class GameViewController: UIViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        createBox()
-        
         if goingLeft == false {
             person.removeAllActions()
             person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(-100, 0, 0), duration: 20)))
@@ -80,11 +96,12 @@ class GameViewController: UIViewController {
     func createScene() {
         
         boxNumber = 0
+        prevBoxNumber = 0
         
         self.view.backgroundColor = UIColor.white
         
         let sceneView = self.view as! SCNView
-        
+        sceneView.delegate = self
         sceneView.scene = scene
         
         // Create Person
@@ -119,6 +136,10 @@ class GameViewController: UIViewController {
         firstBox.position = SCNVector3Make(0, 0, 0)
         scene.rootNode.addChildNode(firstBox)
         firstBox.name = "\(boxNumber)"
+        
+        for _ in 0...6 {
+            createBox()
+        }
         
         // Create Light
         let light = SCNNode()
