@@ -27,6 +27,8 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
     
     var boxNumber = Int()
     
+    var firstOne = Bool()
+    
     override func viewDidLoad() {
         self.createScene()
     }
@@ -96,9 +98,21 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
         switch randomNumber {
         case 0:
             tempBox.position = SCNVector3Make((prevBox?.position.x)! - firstBox.scale.x, (prevBox?.position.y)!, (prevBox?.position.z)!)
+            
+            if firstOne == true {
+                firstOne = false
+                goingLeft = false
+            }
+            
             break
         case 1:
             tempBox.position = SCNVector3Make((prevBox?.position.x)!, (prevBox?.position.y)!, (prevBox?.position.z)! - firstBox.scale.z)
+            
+            if firstOne == true {
+                firstOne = false
+                goingLeft = true
+            }
+            
             break
         default:
             break
@@ -117,6 +131,7 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
             person.removeAllActions()
             person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(-100, 0, 0), duration: 20)))
             goingLeft = true
+        
         } else {
             person.removeAllActions()
             person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(0, 0, -100), duration: 20)))
@@ -132,6 +147,7 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
         
         boxNumber = 0
         prevBoxNumber = 0
+        firstOne = true
         
         self.view.backgroundColor = UIColor.white
         
