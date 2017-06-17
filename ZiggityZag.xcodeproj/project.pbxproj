@@ -15,6 +15,7 @@
 		A7270E281EF4838E00A45483 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A7270E261EF4838E00A45483 /* LaunchScreen.storyboard */; };
 		A7270E331EF4838E00A45483 /* ZiggityZagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7270E321EF4838E00A45483 /* ZiggityZagTests.swift */; };
 		A7270E3E1EF4838E00A45483 /* ZiggityZagUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7270E3D1EF4838E00A45483 /* ZiggityZagUITests.swift */; };
+		A7270E4C1EF5A1C200A45483 /* Coin.dae in Resources */ = {isa = PBXBuildFile; fileRef = A7270E4B1EF5A1C200A45483 /* Coin.dae */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		A7270E391EF4838E00A45483 /* ZiggityZagUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZiggityZagUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7270E3D1EF4838E00A45483 /* ZiggityZagUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZiggityZagUITests.swift; sourceTree = "<group>"; };
 		A7270E3F1EF4838E00A45483 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7270E4B1EF5A1C200A45483 /* Coin.dae */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml.dae; path = Coin.dae; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 		A7270E1A1EF4838E00A45483 /* ZiggityZag */ = {
 			isa = PBXGroup;
 			children = (
+				A7270E4B1EF5A1C200A45483 /* Coin.dae */,
 				A7270E1B1EF4838E00A45483 /* AppDelegate.swift */,
 				A7270E1D1EF4838E00A45483 /* art.scnassets */,
 				A7270E1F1EF4838E00A45483 /* GameViewController.swift */,
@@ -238,6 +241,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7270E4C1EF5A1C200A45483 /* Coin.dae in Resources */,
 				A7270E1E1EF4838E00A45483 /* art.scnassets in Resources */,
 				A7270E281EF4838E00A45483 /* LaunchScreen.storyboard in Resources */,
 				A7270E251EF4838E00A45483 /* Assets.xcassets in Resources */,

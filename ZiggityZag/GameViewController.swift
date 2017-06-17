@@ -13,6 +13,7 @@ import SceneKit
 class GameViewController: UIViewController, SCNSceneRendererDelegate {
 
     let scene = SCNScene()
+    
     let cameraNode = SCNNode()
     
     var person = SCNNode()
@@ -32,6 +33,35 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
     override func viewDidLoad() {
         self.createScene()
     }
+    
+    // fade in
+    
+    func fadeIn(node: SCNNode){
+        node.opacity = 0
+        node.runAction(SCNAction.fadeIn(duration: 0.5))
+    }
+    
+    
+    func createCoin(box: SCNNode){
+        let spin = SCNAction.rotate(by: CGFloat(Double.pi * 2), around: SCNVector3Make(0, 0.5, 0), duration: 0.5)
+        let randomNumber = arc4random() % 8
+        if randomNumber == 3 {
+            let coinScene = SCNScene(named: "Coin.dae")
+            let coin = coinScene?.rootNode.childNode(withName: "Coin", recursively: true)
+            coin?.position = SCNVector3Make(box.position.x, box.position.y + 1, box.position.z)
+            coin?.scale = SCNVector3Make(0.2, 0.2, 0.2)
+            scene.rootNode.addChildNode(coin!)
+            coin?.runAction(SCNAction.repeatForever(spin))
+            fadeIn(node: coin!)
+        }
+        
+        
+    }
+    
+    
+    
+    // fade out
+    
     
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
@@ -119,6 +149,8 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
         }
         
         self.scene.rootNode.addChildNode(tempBox)
+        createCoin(box: tempBox)
+        //fadeIn(node: tempBox)
         
         
     }
@@ -204,7 +236,6 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
         light2.light?.type = SCNLight.LightType.directional
         light2.eulerAngles = SCNVector3Make(45, 45, 0)
         scene.rootNode.addChildNode(light2)
-        
         
     }
 
