@@ -38,6 +38,8 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     var score = Int()
     var highScore = Int()
     
+    var dead = Bool()
+    
     override func viewDidLoad() {
         self.createScene()
         scene.physicsWorld.contactDelegate = self
@@ -65,6 +67,17 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     func addScore() {
         score += 1
         print(score)
+        
+        if score > highScore {
+            
+            highScore = score
+            
+            let scoreDefault = UserDefaults.standard
+            scoreDefault.set(highScore, forKey: "highscore")
+            print(highScore)
+            
+        }
+        
     }
     
     
@@ -79,6 +92,9 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     
     func createCoin(box: SCNNode){
+        
+        scene.physicsWorld.gravity = SCNVector3Make(0, 0, 0)
+        
         let spin = SCNAction.rotate(by: CGFloat(Double.pi * 2), around: SCNVector3Make(0, 0.5, 0), duration: 0.5)
         let randomNumber = arc4random() % 8
         if randomNumber == 3 {
@@ -109,30 +125,33 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         
-        let deleteBox = self.scene.rootNode.childNode(withName: "\(prevBoxNumber)", recursively: true)
-        
-        let currentBox = self.scene.rootNode.childNode(withName: "\(prevBoxNumber + 1)", recursively: true)
-        
-        if (deleteBox?.position.x)! > person.position.x + 1 || (deleteBox?.position.z)! > person.position.z + 1 {
+        if dead == false {
             
-            prevBoxNumber += 1
-            deleteBox?.removeFromParentNode()
-        
-            createBox()
+            let deleteBox = self.scene.rootNode.childNode(withName: "\(prevBoxNumber)", recursively: true)
             
+            let currentBox = self.scene.rootNode.childNode(withName: "\(prevBoxNumber + 1)", recursively: true)
+            
+            if (deleteBox?.position.x)! > person.position.x + 1 || (deleteBox?.position.z)! > person.position.z + 1 {
+                
+                prevBoxNumber += 1
+                deleteBox?.removeFromParentNode()
+                
+                createBox()
+                
+            }
+            
+            if person.position.x > (currentBox?.position.x)! - 0.5 && person.position.x < (currentBox?.position.x)! + 0.5 || person.position.z > (currentBox?.position.z)! - 0.5 && person.position.z < (currentBox?.position.z)! + 0.5 {
+                
+                // On platform
+                
+                
+            } else {
+                
+                die()
+                dead = true
+                
+            }
         }
-        
-        if person.position.x > (currentBox?.position.x)! - 0.5 && person.position.x < (currentBox?.position.x)! + 0.5 || person.position.z > (currentBox?.position.z)! - 0.5 && person.position.z < (currentBox?.position.z)! + 0.5 {
-            
-            // On platform
-            
-            
-        } else {
-            
-            die()
-            
-        }
-        
     }
     
     func die() {
@@ -202,6 +221,10 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
+        if dead == true {
+            return
+        }
+        
         if goingLeft == false {
             person.removeAllActions()
             person.runAction(SCNAction.repeatForever(SCNAction.move(by: SCNVector3Make(-100, 0, 0), duration: 20)))
@@ -219,11 +242,25 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     
     func createScene() {
+    
+        let scoreDefault = UserDefaults.standard
+        
+        if scoreDefault.integer(forKey: "highscore") != 0 {
+            highScore = scoreDefault.integer(forKey: "highscore")
+        } else {
+            
+            highScore = 0
+            
+        }
+        
+        print(highScore)
+        
         
         boxNumber = 0
         prevBoxNumber = 0
         firstOne = true
-        
+        dead = false
+    
         self.view.backgroundColor = UIColor.white
         
         let sceneView = self.view as! SCNView
