@@ -40,10 +40,53 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     var dead = Bool()
     
+    //var gameButton = UIButton()
+    
+    var scoreLbl = UILabel()
+    var highscoreLbl = UILabel()
+    
+    
     override func viewDidLoad() {
         self.createScene()
+        
+        scoreLbl = UILabel(frame: CGRect(x: self.view.frame.width / 2, y: self.view.frame.height / 2 + self.view.frame.height / 2.5, width: self.view.frame.width, height: 100))
+        scoreLbl.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height / 2 - self.view.frame.height / 2.5)
+        
+        
+        scoreLbl.textAlignment = .center
+        scoreLbl.text = "Score: \(score)"
+        scoreLbl.textColor = UIColor.darkGray
+        self.view.addSubview(scoreLbl)
+        
+        highscoreLbl = UILabel(frame: CGRect(x: self.view.frame.width / 2, y: self.view.frame.height / 2 + self.view.frame.height / 2.5, width: self.view.frame.width, height: 100))
+        highscoreLbl.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height / 2 + self.view.frame.height / 2.5)
+        
+        highscoreLbl.textAlignment = .center
+        highscoreLbl.text = "Highscore: \(highScore)"
+        highscoreLbl.textColor = UIColor.darkGray
+        self.view.addSubview(highscoreLbl)
+        
+        
+        // authenticatePlayer()
+        
         scene.physicsWorld.contactDelegate = self
+        
+        /*
+        gameButton = UIButton(type: .custom)
+        gameButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        gameButton.center = CGPoint(x: self.view.frame.width - 40, y: 60)
+        gameButton.setImage(UIImage(named: "gamecenter"), for: .normal)
+        gameButton.addTarget(self, action: ("ShowLeaderBoard"), for: .touchUpInside)
+        self.view.addSubview(gameButton)
+        */
+        
     }
+    
+    func updateLabel() {
+        scoreLbl.text = "Score: \(score)"
+        highscoreLbl.text = "Highscore: \(highScore)"
+    }
+    
     
     
     func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
@@ -66,8 +109,10 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     func addScore() {
         score += 1
-        print(score)
+    
+        self.performSelector(onMainThread: Selector("updateLabel"), with: nil, waitUntilDone: false)
         
+    
         if score > highScore {
             
             highScore = score
