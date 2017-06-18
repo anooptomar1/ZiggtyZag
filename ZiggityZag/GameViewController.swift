@@ -9,13 +9,14 @@
 import UIKit
 import QuartzCore
 import SceneKit
+import GameKit
 
 struct bodyNames {
     static let Person = 0x1 << 1
     static let Coin = 0x1 << 2
 }
 
-class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysicsContactDelegate {
+class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysicsContactDelegate, GKGameCenterControllerDelegate {
 
     let scene = SCNScene()
     
@@ -40,14 +41,15 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     var dead = Bool()
     
-    //var gameButton = UIButton()
-    
     var scoreLbl = UILabel()
     var highscoreLbl = UILabel()
     
+    var gameButton = UIButton()
     
     override func viewDidLoad() {
         self.createScene()
+        
+        authenticatePlayer()
         
         scoreLbl = UILabel(frame: CGRect(x: self.view.frame.width / 2, y: self.view.frame.height / 2 + self.view.frame.height / 2.5, width: self.view.frame.width, height: 100))
         scoreLbl.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height / 2 - self.view.frame.height / 2.5)
@@ -66,19 +68,16 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
         highscoreLbl.textColor = UIColor.darkGray
         self.view.addSubview(highscoreLbl)
         
-        
-        // authenticatePlayer()
-        
         scene.physicsWorld.contactDelegate = self
         
-        /*
+        
         gameButton = UIButton(type: .custom)
         gameButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         gameButton.center = CGPoint(x: self.view.frame.width - 40, y: 60)
         gameButton.setImage(UIImage(named: "gamecenter"), for: .normal)
-        gameButton.addTarget(self, action: ("ShowLeaderBoard"), for: .touchUpInside)
+        gameButton.addTarget(self, action: ("showLeaderboard"), for: .touchUpInside)
         self.view.addSubview(gameButton)
-        */
+        
         
     }
     
@@ -135,6 +134,16 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
         node.runAction(SCNAction.fadeIn(duration: 0.5))
     }
     
+    // fade out
+    
+    func fadeOut(node: SCNNode) {
+        let move = SCNAction.move(by: SCNVector3Make(node.position.x, node.position.y - 2, node.position.z), duration: 0.5)
+        node.runAction(move)
+        node.runAction(SCNAction.fadeOut(duration: 0.5))
+        
+        
+    }
+    
     
     func createCoin(box: SCNNode){
         
@@ -155,17 +164,14 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
             coin?.physicsBody?.isAffectedByGravity = false
             
             scene.rootNode.addChildNode(coin!)
-            coin?.runAction(SCNAction.repeatForever(spin))
+            
             fadeIn(node: coin!)
+            
+            coin?.runAction(SCNAction.repeatForever(spin))
         }
         
         
     }
-    
-    
-    
-    // fade out
-    
     
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
@@ -178,8 +184,10 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
             
             if (deleteBox?.position.x)! > person.position.x + 1 || (deleteBox?.position.z)! > person.position.z + 1 {
                 
+                //fadeOut(node: deleteBox!)
+                
                 prevBoxNumber += 1
-                deleteBox?.removeFromParentNode()
+                //deleteBox?.removeFromParentNode()
                 
                 createBox()
                 
@@ -225,6 +233,9 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     func createBox() {
         tempBox = SCNNode(geometry: firstBox.geometry)
+        
+        fadeIn(node: tempBox)
+        
         let prevBox = scene.rootNode.childNode(withName: "\(boxNumber)", recursively: true)
         
         boxNumber += 1
@@ -288,6 +299,8 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     
     func createScene() {
     
+        score = 0
+        
         let scoreDefault = UserDefaults.standard
         
         if scoreDefault.integer(forKey: "highscore") != 0 {
@@ -370,5 +383,57 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
         scene.rootNode.addChildNode(light2)
         
     }
+    
+    func authenticatePlayer(){
+        
+        let localPlayer = GKLocalPlayer()
+        
+        localPlayer.authenticateHandler = {
+            (viewController, error) in
+            
+            if viewController != nil {
+                self.present(viewController!, animated: true, completion: nil)
+            } else {
+                print("logged in")
+            }
+            
+        }
+        
+    }
+    
+    func saveHighscore(score: Int) {
+        
+        if GKLocalPlayer.localPlayer().isAuthenticated {
+            
+            let scoreReporter = GKScore(leaderboardIdentifier: "zag.001")
+            
+            scoreReporter.value = Int64(score)
+            
+            let scoreArray : [GKScore] = [scoreReporter]
+            
+            GKScore.report(scoreArray, withCompletionHandler: nil)
+            
+        }
+        
+    }
+    
+    func showLeaderboard() {
+        
+        saveHighscore(score: highScore)
+        
+        let gc = GKGameCenterViewController()
+        
+        gc.gameCenterDelegate = self
+        
+        self.present(gc, animated: true, completion: nil)
+        
+    }
+    
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+        
+        gameCenterViewController.dismiss(animated: true, completion: nil)
+        
+    }
+    
 
 }
