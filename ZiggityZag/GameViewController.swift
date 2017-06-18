@@ -10,7 +10,12 @@ import UIKit
 import QuartzCore
 import SceneKit
 
-class GameViewController: UIViewController, SCNSceneRendererDelegate {
+struct bodyNames {
+    static let Person = 0x1 << 1
+    static let Coin = 0x1 << 2
+}
+
+class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysicsContactDelegate {
 
     let scene = SCNScene()
     
@@ -30,9 +35,40 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
     
     var firstOne = Bool()
     
+    var score = Int()
+    var highScore = Int()
+    
     override func viewDidLoad() {
         self.createScene()
+        scene.physicsWorld.contactDelegate = self
     }
+    
+    
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+        
+        let nodeA = contact.nodeA
+        let nodeB = contact.nodeB
+        
+        if nodeA.physicsBody?.categoryBitMask == bodyNames.Coin && nodeB.physicsBody?.categoryBitMask == bodyNames.Person {
+            
+            nodeA.removeFromParentNode()
+            addScore()
+            
+        } else if nodeA.physicsBody?.categoryBitMask == bodyNames.Person && nodeB.physicsBody?.categoryBitMask == bodyNames.Coin {
+            
+            nodeB.removeFromParentNode()
+            addScore()
+            
+        }
+    }
+    
+    func addScore() {
+        score += 1
+        print(score)
+    }
+    
+    
+    
     
     // fade in
     
@@ -50,6 +86,13 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
             let coin = coinScene?.rootNode.childNode(withName: "Coin", recursively: true)
             coin?.position = SCNVector3Make(box.position.x, box.position.y + 1, box.position.z)
             coin?.scale = SCNVector3Make(0.2, 0.2, 0.2)
+            
+            coin?.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.dynamic, shape: SCNPhysicsShape(node: coin!, options: nil))
+            coin?.physicsBody?.categoryBitMask = bodyNames.Coin
+            coin?.physicsBody?.contactTestBitMask = bodyNames.Person
+            coin?.physicsBody?.collisionBitMask = bodyNames.Person
+            coin?.physicsBody?.isAffectedByGravity = false
+            
             scene.rootNode.addChildNode(coin!)
             coin?.runAction(SCNAction.repeatForever(spin))
             fadeIn(node: coin!)
@@ -194,6 +237,13 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate {
         personMat.diffuse.contents = UIColor.red
         personGeo.materials = [personMat]
         person.position = SCNVector3Make(0, 1.1, 0)
+        
+        person.physicsBody = SCNPhysicsBody(type: SCNPhysicsBodyType.static, shape: SCNPhysicsShape(node: person, options: nil))
+        person.physicsBody?.categoryBitMask = bodyNames.Person
+        person.physicsBody?.collisionBitMask = bodyNames.Coin
+        person.physicsBody?.contactTestBitMask = bodyNames.Coin
+        person.physicsBody?.isAffectedByGravity = false
+        
         scene.rootNode.addChildNode(person)
         
         
