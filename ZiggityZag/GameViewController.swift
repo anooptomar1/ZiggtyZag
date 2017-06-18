@@ -75,7 +75,7 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
         gameButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         gameButton.center = CGPoint(x: self.view.frame.width - 40, y: 60)
         gameButton.setImage(UIImage(named: "gamecenter"), for: .normal)
-        gameButton.addTarget(self, action: ("showLeaderboard"), for: .touchUpInside)
+        gameButton.addTarget(self, action: (#selector(GameViewController.showLeaderboard)), for: .touchUpInside)
         self.view.addSubview(gameButton)
         
         
@@ -109,7 +109,7 @@ class GameViewController: UIViewController, SCNSceneRendererDelegate, SCNPhysics
     func addScore() {
         score += 1
     
-        self.performSelector(onMainThread: Selector("updateLabel"), with: nil, waitUntilDone: false)
+        self.performSelector(onMainThread: #selector(GameViewController.updateLabel), with: nil, waitUntilDone: false)
         
     
         if score > highScore {
